@@ -13,6 +13,33 @@
 #define RELAY_ON LOW
 #define SERVO_PIN D6  //V6=servoPos
 
+DHTesp dht;
+Servo servo;
+
+char auth[] = "udGkXpgDnwhJ6a81s0JKs_YfEkXPwHh7";
+char ssid[] = "Andromax-M3Y-FFE1";
+char pass[] = "30342132";
+unsigned long previousMillis = 0;
+long interval = 2000; //min. 2000ms
+float h;
+float t;
+int pirState = LOW;
+int pirValue = 0;
+
+
+
+void setup() {
+  Serial.begin(9600);
+  Blynk.begin(auth, ssid, pass);
+  dht.setup(DHT_PIN, DHTesp::DHTTYPE);
+  pinMode(PIR_PIN, INPUT);
+  digitalWrite(RELAY1_PIN, !RELAY_ON);
+  digitalWrite(RELAY2_PIN, !RELAY_ON);
+  pinMode(RELAY1_PIN, OUTPUT);
+  pinMode(RELAY2_PIN, OUTPUT);
+  servo.attach(SERVO_PIN);
+}
+
 BLYNK_WRITE(V4)
 {
   int state = param.asInt();
@@ -25,30 +52,10 @@ BLYNK_WRITE(V5)
   digitalWrite(RELAY2_PIN, !state);
 }
 
-DHTesp dht;
-Servo servo;
-
-char auth[] = "udGkXpgDnwhJ6a81s0JKs_YfEkXPwHh7";
-char ssid[] = "PW";
-char pass[] = "Password";
-unsigned long previousMillis = 0;
-long interval = 2000; //min. 2000ms
-float h;
-float t;
-int pirState = LOW;
-int pirValue = 0;
-int servoPos = 0;
-
-void setup() {
-  Serial.begin(9600);
-  Blynk.begin(auth, ssid, pass);
-  dht.setup(DHT_PIN, DHTesp::DHTTYPE);
-  pinMode(PIR_PIN, INPUT);
-  digitalWrite(RELAY1_PIN, !RELAY_ON);
-  digitalWrite(RELAY2_PIN, !RELAY_ON);
-  pinMode(RELAY1_PIN, OUTPUT);
-  pinMode(RELAY2_PIN, OUTPUT);
-  servo.attach(SERVO_PIN);
+BLYNK_WRITE(V6)
+{
+  int servoPos = param.asInt();
+  servo.write(servoPos);
 }
 
 void loop() {
